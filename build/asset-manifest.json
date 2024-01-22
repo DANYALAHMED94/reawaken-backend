@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/static/css/main.c2cfcd4a.css",
+    "main.js": "/static/js/main.632304cc.js",
+    "static/media/Exo2-Bold.ttf": "/static/media/Exo2-Bold.343af6210440d7ad761e.ttf",
+    "static/media/Exo2-Medium.ttf": "/static/media/Exo2-Medium.2652eb40eee461d69f6b.ttf",
+    "static/media/Exo2-Regular.ttf": "/static/media/Exo2-Regular.d8703b6aa928306cccf5.ttf",
+    "static/media/image.svg": "/static/media/image.88184a0daa6df81bcf2f220f1d878398.svg",
+    "static/media/revicons.eot": "/static/media/revicons.a77de540a38981833f9e.eot",
+    "static/media/revicons.ttf": "/static/media/revicons.57fd05d4ae650374c8de.ttf",
+    "static/media/revicons.woff": "/static/media/revicons.e8746a624ed098489406.woff",
+    "index.html": "/index.html",
+    "static/media/Vector 3.svg": "/static/media/Vector 3.3225141a4193c9ac7d36.svg",
+    "static/media/setting.svg": "/static/media/setting.b0df1dd558927725a280.svg",
+    "main.c2cfcd4a.css.map": "/static/css/main.c2cfcd4a.css.map",
+    "main.632304cc.js.map": "/static/js/main.632304cc.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c2cfcd4a.css",
+    "static/js/main.632304cc.js"
+  ]
+}

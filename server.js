@@ -26,6 +26,18 @@ app.use(express.urlencoded({ extended: true, limit: "500mb" }));
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 app.use("/api", profileRoute);
 
+if (process.env.NODE_ENV === "PRODUCTION") {
+  app.use(express.static(path.join(__dirname, "./build")));
+
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname, "./build/index.html"))
+  );
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running...");
+  });
+}
+
 const PORT = process.env.PORT || 5050;
 app.listen(PORT, (req, res) => {
   console.log(`server is running on port ${PORT}`);

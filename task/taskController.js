@@ -69,7 +69,7 @@ const getTodoTask = async (req, res) => {
     try {
       const values = await Task.find({
         userId: userId,
-        taskStatus: "To do",
+        taskStatus: "Todo",
       }).populate("userId", "-password");
       res.status(200).json({
         success: true,
@@ -149,7 +149,35 @@ const getCompletedTask = async (req, res) => {
   }
 };
 
-export { AddTask, getTask, getTodoTask, getCompletedTask, getInProgressTask };
+const updateTask = async (req, res) => {
+  const { taskId, taskStatus } = req.body;
+
+  try {
+    const values = await Task.findByIdAndUpdate(
+      { _id: taskId },
+      { $set: { taskStatus: taskStatus } }
+    );
+    res.status(200).json({
+      success: true,
+      message: "Task Updated",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+};
+
+export {
+  AddTask,
+  getTask,
+  getTodoTask,
+  getCompletedTask,
+  getInProgressTask,
+  updateTask,
+};
 
 const sendForgetPasswordLink = (user, token) => {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);

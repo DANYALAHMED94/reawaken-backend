@@ -33,7 +33,7 @@ const Signup = async (req, res) => {
           process.env.JWT_SECRET,
           { expiresIn: "30d" }
         );
-
+        welcomeMail(saveUser);
         res.status(200).json({
           success: true,
           message: "Signup successful",
@@ -109,9 +109,7 @@ const Login = async (req, res) => {
 
 const forgetPassword = async (req, res) => {
   const { email } = req.body;
-
   const user = await User.findOne({ email: email });
-
   if (user) {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
@@ -133,7 +131,6 @@ const forgetPassword = async (req, res) => {
 const updateForgetPassword = async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
-
   const { id } = jwt.verify(token, process.env.JWT_SECRET);
   if (id) {
     try {
@@ -167,7 +164,7 @@ const sendForgetPasswordLink = (user, token) => {
     to: `${user?.email}`,
     from: {
       name: "re-awake",
-      email: "testuser@guddge.com",
+      email: "ziaareact@gmail.com",
     }, // Use the email address or domain you verified above
     subject: "Password Reset Request.",
     text: `Reset your password?`,
@@ -177,6 +174,30 @@ const sendForgetPasswordLink = (user, token) => {
         Click here
     </button>
 </a>`,
+  };
+  try {
+    sgMail.send(msg);
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
+const welcomeMail = (user) => {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  const msg = {
+    to: `${user?.email}`,
+    from: {
+      name: "Reawake",
+      email: "ziaareact@gmail.com",
+    }, // Use the email address or domain you verified above
+    subject: "Welcome to reawake.",
+    text: `You have successfully signed up to Reawaken.`,
+    html: `<p style="text-transform: capitalize">${user?.firstName}</p> 
+
+    <p>You don't have to wait to experience <strong>reawake</strong>. As a welcome to our community,</p> 
+    <p> If you need any help or guidance, just get in touch with us.</p>
+    <p style="margin-top:20px">Thank you!</p> `,
   };
   try {
     sgMail.send(msg);

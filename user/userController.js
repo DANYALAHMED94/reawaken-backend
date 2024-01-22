@@ -1,10 +1,9 @@
 import User from "./userModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import sgMail from "@sendgrid/mail";
 
 const Signup = async (req, res) => {
-  const { firstName, lastName, phoneNumber, email, password } = req.body;
+  const { name, email, password } = req.body;
 
   const user = await User.findOne({ email: email });
   if (user) {
@@ -13,17 +12,15 @@ const Signup = async (req, res) => {
       message: "User already exist",
     });
   } else {
-    if (firstName && lastName && email && password && phoneNumber) {
+    if (name && email && password) {
       try {
         const salt = await bcrypt.genSalt(10);
         const hashPassword = await bcrypt.hash(password, salt);
 
         const newUser = new User({
-          firstName: firstName,
+          name: name,
           email: email,
           password: hashPassword,
-          lastName: lastName,
-          phoneNumber: phoneNumber,
         });
         await newUser.save();
 
@@ -38,10 +35,8 @@ const Signup = async (req, res) => {
           success: true,
           message: "Signup successful",
           userID: saveUser._id,
-          firstName: saveUser.firstName,
-          lastName: saveUser.lastName,
+          name: saveUser.name,
           email: saveUser.email,
-          phoneNumber: saveUser.phoneNumber,
           token: token,
         });
       } catch (error) {
@@ -107,81 +102,4 @@ const Login = async (req, res) => {
   }
 };
 
-const forgetPassword = async (req, res) => {
-  const { email } = req.body;
-
-  const user = await User.findOne({ email: email });
-
-  if (user) {
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-    sendForgetPasswordLink(user, token);
-    res.status(200).json({
-      success: true,
-      message:
-        "Email Sent. Please check your email for password reset instructions",
-    });
-  } else {
-    res.status(400).json({
-      success: false,
-      message: "Email Not Found",
-    });
-  }
-};
-
-const updateForgetPassword = async (req, res) => {
-  const { token } = req.params;
-  const { password } = req.body;
-
-  const { id } = jwt.verify(token, process.env.JWT_SECRET);
-  if (id) {
-    try {
-      const salt = await bcrypt.genSalt(10);
-      const hashPassword = await bcrypt.hash(password, salt);
-
-      await User.findByIdAndUpdate(id, { password: hashPassword });
-      res.status(200).json({
-        success: true,
-        message: "Password Updated Successfully",
-      });
-    } catch {
-      res.status(400).json({
-        success: false,
-        message: "Something wents wrong",
-      });
-    }
-  } else {
-    res.status(400).json({
-      success: false,
-      message: "Something wents wrong",
-    });
-  }
-};
-
-export { Signup, Login, forgetPassword, updateForgetPassword };
-
-const sendForgetPasswordLink = (user, token) => {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-  const msg = {
-    to: `${user?.email}`,
-    from: {
-      name: "re-awake",
-      email: "testuser@guddge.com",
-    }, // Use the email address or domain you verified above
-    subject: "Password Reset Request.",
-    text: `Reset your password?`,
-    html: `<p>If you requested a password reset for ${user?.email}, click the button below. This link will expire in 1 hour. If you didn’t make this request, please ignore and contact your administrator.</p> 
-    <a href=http://localhost:3000/forget-password/${token} style="text-decoration: none;">
-    <button style="background-color: blue; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-        Click here
-    </button>
-</a>`,
-  };
-  try {
-    sgMail.send(msg);
-  } catch (error) {
-    console.log(error);
-    return error;
-  }
-};
+export { Signup, Login };

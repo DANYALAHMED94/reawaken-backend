@@ -1,16 +1,12 @@
 import mongoose from "mongoose";
 
 const userSchema = mongoose.Schema({
-  firstName: {
+  name: {
     type: String,
     required: true,
     trim: true,
   },
-  lastName: {
-    type: String,
-    required: true,
-    trim: true,
-  },
+
   email: {
     type: String,
     required: true,
@@ -26,9 +22,8 @@ const userSchema = mongoose.Schema({
     type: String,
     trim: true,
   },
-  filename: {
+  message: {
     type: String,
-    trim: true,
   },
 });
 

@@ -8,6 +8,10 @@ import profileRoute from "./user/userProfileUpload.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import cron from "node-cron";
+import Task from "./task/taskModel.js";
+import twilio from "twilio";
+import User from "./user/userModel.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -37,6 +41,30 @@ if (process.env.NODE_ENV === "PRODUCTION") {
     res.send("API is running...");
   });
 }
+
+cron.schedule("0 0 * * * *", async () => {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const client = new twilio(accountSid, authToken);
+  const today = new Date();
+  const formattedToday = today.toISOString().split("T")[0];
+  const reminders = await Task.find({
+    "reminder.date": { $eq: formattedToday },
+  });
+
+  reminders.forEach(async (reminder) => {
+    // const user = await User.findById({ _id: reminder.userId });
+
+    // Use Twilio API to send SMS
+    client.messages
+      .create({
+        body: `Reminder for the task name ${reminder.taskName} whose status is ${reminder.taskStatus}`,
+        to: process.env.TO_NUMBER, // Text this number
+        from: process.env.TWILIO_FROM_NUMBER, // From a valid Twilio number
+      })
+      .then((message) => console.log(message.body));
+  });
+});
 
 const PORT = process.env.PORT || 5050;
 app.listen(PORT, (req, res) => {

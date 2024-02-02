@@ -1,39 +1,52 @@
 import mongoose from "mongoose";
 
-const taskSchema = mongoose.Schema({
-  taskName: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  taskStatus: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  dueDate: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  reminder: {
-    date: {
+const taskSchema = mongoose.Schema(
+  {
+    taskName: {
       type: String,
       required: true,
       trim: true,
     },
-    time: {
+    taskStatus: {
       type: String,
+      required: true,
       trim: true,
+    },
+    dueDate: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    reminder: {
+      date: {
+        type: String,
+        // required: true,
+        trim: true,
+      },
+      time: {
+        type: String,
+        trim: true,
+        // required: true,
+      },
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
+    notification: {
+      message: {
+        type: String,
+        trim: true,
+      },
+      isOpen: {
+        type: Boolean,
+        default: false,
+      },
+    },
   },
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-});
+  { timestamps: true }
+);
 
 const Task = mongoose.model("Task", taskSchema);
 

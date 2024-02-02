@@ -4,25 +4,37 @@ const AddTask = async (req, res) => {
   const { taskName, taskStatus, dueDate, reminder, userId } = req.body;
 
   if (taskName && taskStatus && reminder && userId && dueDate) {
-    try {
-      const newTask = new Task({
-        taskName: taskName,
-        reminder: reminder,
-        userId: userId,
-        taskStatus: taskStatus,
-        dueDate: dueDate,
-      });
-      await newTask.save();
+    if (reminder.time && reminder.date) {
+      try {
+        const newTask = new Task({
+          taskName: taskName,
+          reminder: reminder,
+          userId: userId,
+          taskStatus: taskStatus,
+          dueDate: dueDate,
+          notification: {
+            message: `You have created ${taskStatus} task`,
+            isOpen: false,
+          },
+        });
+        const saveTask = await newTask.save();
 
-      res.status(200).json({
-        success: true,
-        message: "Task added successfully",
-      });
-    } catch (error) {
-      console.log(error.message);
-      res.status(500).json({
+        res.status(200).json({
+          success: true,
+          message: "Task added successfully",
+          saveTask,
+        });
+      } catch (error) {
+        console.log(error.message);
+        res.status(500).json({
+          success: false,
+          mesaage: "Something wents wrong",
+        });
+      }
+    } else {
+      res.status(400).json({
         success: false,
-        mesaage: "Something wents wrong",
+        message: "Date and Time is required in Reminder",
       });
     }
   } else {
@@ -170,6 +182,121 @@ const updateTask = async (req, res) => {
   }
 };
 
+const getTaskNotification = async (req, res) => {
+  const { userId } = req.params;
+  const projection = {
+    notification: 1,
+    createdAt: 1,
+    reminder: 1,
+  };
+  if (userId) {
+    try {
+      const values = await Task.find(
+        {
+          userId: userId,
+        },
+        projection
+      );
+      res.status(200).json({
+        success: true,
+        message: "All tasks",
+        data: values,
+      });
+    } catch (error) {
+      console.log(error.message);
+      res.status(500).json({
+        success: false,
+        message: "Something went wrong",
+      });
+    }
+  } else {
+    res.status(400).json({
+      success: false,
+      message: "User Id does not exist",
+    });
+  }
+};
+
+const updateTaskNotification = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    await Task.updateMany(
+      { userId: userId },
+      { $set: { "notification.isOpen": true } }
+    );
+    res.status(200).json({
+      success: true,
+      message: "Task Updated",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+};
+
+const getNotification = async (req, res) => {
+  const { userId } = req.params;
+  const projection = {
+    notification: 1,
+  };
+  if (userId) {
+    try {
+      const values = await Task.find(
+        {
+          userId: userId,
+          "notification.isOpen": false,
+        },
+        projection
+      );
+      res.status(200).json({
+        success: true,
+        message: "All tasks",
+        data: values,
+      });
+    } catch (error) {
+      console.log(error.message);
+      res.status(500).json({
+        success: false,
+        message: "Something went wrong",
+      });
+    }
+  } else {
+    res.status(400).json({
+      success: false,
+      message: "User Id does not exist",
+    });
+  }
+};
+
+const deleteNotification = async (req, res) => {
+  const { id } = req.params;
+  const update = { $unset: { notification: 1 } };
+  if (id) {
+    try {
+      await Task.updateOne({ _id: id }, update);
+      res.status(200).json({
+        success: true,
+        message: "Task deleted",
+      });
+    } catch (error) {
+      console.log(error.message);
+      res.status(500).json({
+        success: false,
+        message: "Something went wrong",
+      });
+    }
+  } else {
+    res.status(400).json({
+      success: false,
+      message: "Task Id do not exist",
+    });
+  }
+};
+
 export {
   AddTask,
   getTask,
@@ -177,29 +304,8 @@ export {
   getCompletedTask,
   getInProgressTask,
   updateTask,
-};
-
-const sendForgetPasswordLink = (user, token) => {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-  const msg = {
-    to: `${user?.email}`,
-    from: {
-      name: "guddge",
-      email: "testuser@guddge.com",
-    }, // Use the email address or domain you verified above
-    subject: "Password Reset Request.",
-    text: `Reset your password?`,
-    html: `<p>If you requested a password reset for ${user?.email}, click the button below. This link will expire in 1 hour. If you didn’t make this request, please ignore and contact your administrator.</p> 
-    <a href=http://timesheet.guddge.com/forget-password/${token} style="text-decoration: none;">
-    <button style="background-color: blue; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-        Click here
-    </button>
-</a>`,
-  };
-  try {
-    sgMail.send(msg);
-  } catch (error) {
-    console.log(error);
-    return error;
-  }
+  getTaskNotification,
+  updateTaskNotification,
+  getNotification,
+  deleteNotification,
 };

@@ -1,14 +1,17 @@
 import Task from "./taskModel.js";
 
 const AddTask = async (req, res) => {
-  const { taskName, taskStatus, dueDate, reminder, userId } = req.body;
+  const { taskName, taskStatus, dueDate, date, time, userId } = req.body;
 
-  if (taskName && taskStatus && reminder && userId && dueDate) {
-    if (reminder.time && reminder.date) {
+  if (taskName && taskStatus && date && time && userId && dueDate) {
+    if (time && date) {
       try {
         const newTask = new Task({
           taskName: taskName,
-          reminder: reminder,
+          reminder: {
+            date: date,
+            time: time,
+          },
           userId: userId,
           taskStatus: taskStatus,
           dueDate: dueDate,
@@ -196,7 +199,7 @@ const getTaskNotification = async (req, res) => {
           userId: userId,
         },
         projection
-      );
+      ).sort({ createdAt: -1 });
       res.status(200).json({
         success: true,
         message: "All tasks",

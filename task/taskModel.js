@@ -29,6 +29,12 @@ const taskSchema = mongoose.Schema(
         // required: true,
       },
     },
+    comment: {
+      type: String,
+    },
+    filename: {
+      type: String,
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

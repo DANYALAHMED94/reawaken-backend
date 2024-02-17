@@ -5,10 +5,12 @@ import router from "./user/userRoute.js";
 import taskRouter from "./task/taskRoute.js";
 import dotenv from "dotenv";
 import profileRoute from "./user/userProfileUpload.js";
+import taskRoute from "./task/taskUpload.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import cron from "node-cron";
+import schedule from "node-schedule";
 import Task from "./task/taskModel.js";
 import twilio from "twilio";
 import User from "./user/userModel.js";
@@ -29,6 +31,8 @@ app.use("/api", taskRouter);
 app.use(express.urlencoded({ extended: true, limit: "500mb" }));
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 app.use("/api", profileRoute);
+app.use("/api", taskRoute);
+app.use("/attchments", express.static(path.join(__dirname, "/attchments")));
 
 if (process.env.NODE_ENV === "PRODUCTION") {
   app.use(express.static(path.join(__dirname, "./build")));
@@ -42,27 +46,86 @@ if (process.env.NODE_ENV === "PRODUCTION") {
   });
 }
 
-cron.schedule("0 0 * * * *", async () => {
+const sendMessage = (user, message) => {
+  console.log(user, message);
+  // Logic to send message to user (replace this with your actual messaging code)
+  console.log(`Sending message to ${user.number}: ${message}`);
+};
+
+// cron.schedule("*/1 * * * *", async () => {
+//   const accountSid = process.env.TWILIO_ACCOUNT_SID;
+//   const authToken = process.env.TWILIO_AUTH_TOKEN;
+//   const client = new twilio(accountSid, authToken);
+//   const today = new Date();
+//   const formattedToday = today.toISOString().split("T")[0];
+
+//   const reminders = await Task.find({
+//     "reminder.date": { $eq: formattedToday },
+//   });
+//   reminders.forEach(async (reminder) => {
+//     console.log(reminder.reminder, "iuytre");
+//     // const user = await User.findById({ _id: reminder.userId });
+//     // Use Twilio API to send SMS
+//     // client.messages
+//     //   .create({
+//     //     body: `Reminder for the task name ${reminder.taskName} whose status is ${reminder.taskStatus}`,
+//     //     to: process.env.TO_NUMBER, // Text this number
+//     //     from: process.env.TWILIO_FROM_NUMBER, // From a valid Twilio number
+//     //   })
+//     //   .then((message) => console.log(message.body));
+
+//     const scheduleDate = new Date(reminder?.reminder.date); // Assuming date is stored separately
+//     const scheduleTime = reminder?.reminder.time.split(":"); // Assuming time is stored as HH:MM string
+//     // console.log(scheduleTime, "time");
+//     scheduleDate.setHours(scheduleTime[0]);
+//     scheduleDate.setMinutes(scheduleTime[1]);
+//     // console.log(scheduleDate);
+//     schedule.scheduleJob(scheduleDate, () => {
+//       sendMessage(reminder.userId, reminder.comment);
+//     });
+//     // console.log(`Message scheduled for ${scheduleDate}`);
+//   });
+// });
+
+cron.schedule("* * * * *", async () => {
+  // Run the task every minute
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const client = new twilio(accountSid, authToken);
   const today = new Date();
   const formattedToday = today.toISOString().split("T")[0];
+
   const reminders = await Task.find({
     "reminder.date": { $eq: formattedToday },
   });
+  // Get the current date and time
+  const currentTime = new Date();
 
   reminders.forEach(async (reminder) => {
-    // const user = await User.findById({ _id: reminder.userId });
+    const reminderDate = new Date(reminder.reminder.date);
+    const reminderTime = reminder.reminder.time.split(":");
+    reminderDate.setHours(reminderTime[0]);
+    reminderDate.setMinutes(reminderTime[1]);
+    const currentHours = currentTime.getHours();
+    const currentMinutes = currentTime.getMinutes();
 
-    // Use Twilio API to send SMS
-    client.messages
-      .create({
-        body: `Reminder for the task name ${reminder.taskName} whose status is ${reminder.taskStatus}`,
-        to: process.env.TO_NUMBER, // Text this number
-        from: process.env.TWILIO_FROM_NUMBER, // From a valid Twilio number
-      })
-      .then((message) => console.log(message.body));
+    const reminderHours = reminderDate.getHours();
+    const reminderMinutes = reminderDate.getMinutes();
+
+    // Check if the current time matches the reminder time
+    if (currentHours === reminderHours && currentMinutes === reminderMinutes) {
+      const user = await User.findById({ _id: reminder.userId });
+      // Use Twilio API to send SMS
+      if (user.phoneNumber) {
+        client.messages
+          .create({
+            body: `Reminder for the task name ${reminder.taskName} whose status is ${reminder.taskStatus}`,
+            to: `${user.phoneNumber}`, // Text this number
+            from: process.env.TWILIO_FROM_NUMBER, // From a valid Twilio number
+          })
+          .then((message) => console.log(message.body));
+      }
+    }
   });
 });
 

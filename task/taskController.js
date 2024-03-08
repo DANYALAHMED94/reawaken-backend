@@ -300,6 +300,27 @@ const deleteNotification = async (req, res) => {
   }
 };
 
+const updateTaskComment = async (req, res) => {
+  const { id } = req.params;
+  const { comment } = req.body;
+  const newComment = {
+    text: comment,
+  };
+  try {
+    await Task.updateMany({ _id: id }, { $push: { comment: newComment } });
+    res.status(200).json({
+      success: true,
+      message: "comments",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+};
+
 export {
   AddTask,
   getTask,
@@ -311,4 +332,5 @@ export {
   updateTaskNotification,
   getNotification,
   deleteNotification,
+  updateTaskComment,
 };

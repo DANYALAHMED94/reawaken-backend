@@ -40,15 +40,17 @@ taskRoute.put("/task/:id", upload.single("filename"), async (req, res) => {
   const { taskName, comment } = req.body;
   const { id } = req.params;
   const filename = req?.file?.filename;
+  const fileOriginalName = req?.file?.originalname;
+
   const task = await Task.findById(id);
-  if (taskName || comment || filename) {
+  if (taskName || comment || fileOriginalName || filename) {
     try {
       if (task) {
         if (task?.filename?.length && filename?.length) {
           removeImage(task?.filename);
         }
         task.taskName = taskName || task.taskName;
-        task.comment = comment || task.comment;
+        task.fileOriginalName = fileOriginalName || task.fileOriginalName;
         task.filename = filename ?? task.filename;
         const savetask = await task.save();
         if (savetask) {
@@ -57,7 +59,7 @@ taskRoute.put("/task/:id", upload.single("filename"), async (req, res) => {
             message: "Task updated successfully",
             task: {
               taskName: savetask?.taskName,
-              comment: savetask?.comment,
+              fileOriginalName: savetask?.fileOriginalName,
               filename: savetask?.filename,
             },
           });

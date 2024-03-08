@@ -29,10 +29,15 @@ const taskSchema = mongoose.Schema(
         // required: true,
       },
     },
-    comment: {
+    comment: [
+      {
+        text: String,
+      },
+    ],
+    filename: {
       type: String,
     },
-    filename: {
+    fileOriginalName: {
       type: String,
     },
     userId: {

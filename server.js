@@ -9,6 +9,7 @@ import taskRoute from "./task/taskUpload.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import fs from "fs";
 import cron from "node-cron";
 import schedule from "node-schedule";
 import Task from "./task/taskModel.js";
@@ -34,6 +35,25 @@ app.use("/api", profileRoute);
 app.use("/api", taskRoute);
 app.use("/attchments", express.static(path.join(__dirname, "/attchments")));
 
+app.get("/api/pdf/:id", async (req, res) => {
+  const { id } = req.params;
+  const task = await Task.findById(id);
+  if (task?.filename) {
+    const filePath = path.join(__dirname, "attchments", task?.filename);
+    res.status(200).json({
+      success: true,
+      file: filePath,
+      comment: task?.comment,
+      fileOriginalName: task?.fileOriginalName,
+    });
+  } else {
+    res.status(400).json({
+      success: false,
+      message: "comments and attachments not found",
+    });
+  }
+});
+
 if (process.env.NODE_ENV === "PRODUCTION") {
   app.use(express.static(path.join(__dirname, "./build")));
 
@@ -45,12 +65,6 @@ if (process.env.NODE_ENV === "PRODUCTION") {
     res.send("API is running...");
   });
 }
-
-const sendMessage = (user, message) => {
-  console.log(user, message);
-  // Logic to send message to user (replace this with your actual messaging code)
-  console.log(`Sending message to ${user.number}: ${message}`);
-};
 
 // cron.schedule("*/1 * * * *", async () => {
 //   const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -100,7 +114,6 @@ cron.schedule("* * * * *", async () => {
   });
   // Get the current date and time
   const currentTime = new Date();
-
   reminders.forEach(async (reminder) => {
     const reminderDate = new Date(reminder.reminder.date);
     const reminderTime = reminder.reminder.time.split(":");
@@ -108,10 +121,8 @@ cron.schedule("* * * * *", async () => {
     reminderDate.setMinutes(reminderTime[1]);
     const currentHours = currentTime.getHours();
     const currentMinutes = currentTime.getMinutes();
-
     const reminderHours = reminderDate.getHours();
     const reminderMinutes = reminderDate.getMinutes();
-
     // Check if the current time matches the reminder time
     if (currentHours === reminderHours && currentMinutes === reminderMinutes) {
       const user = await User.findById({ _id: reminder.userId });
@@ -120,7 +131,8 @@ cron.schedule("* * * * *", async () => {
         client.messages
           .create({
             body: `Reminder for the task name ${reminder.taskName} whose status is ${reminder.taskStatus}`,
-            to: `${user.phoneNumber}`, // Text this number
+            // to: `${user.phoneNumber}`, // Text this number
+            to: process.env.TO_NUMBER, // Text this number
             from: process.env.TWILIO_FROM_NUMBER, // From a valid Twilio number
           })
           .then((message) => console.log(message.body));

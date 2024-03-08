@@ -9,6 +9,7 @@ import {
   getTodoTask,
   updateTask,
   updateTaskNotification,
+  updateTaskComment,
 } from "./taskController.js";
 import express from "express";
 
@@ -24,5 +25,6 @@ taskRouter.get("/new-notification/:userId", getNotification);
 taskRouter.put("/update-task", updateTask);
 taskRouter.put("/update-notification/:userId", updateTaskNotification);
 taskRouter.put("/delete-notification/:id", deleteNotification);
+taskRouter.put("/add-comment/:id", updateTaskComment);
 
 export default taskRouter;

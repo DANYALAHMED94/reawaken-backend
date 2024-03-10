@@ -33,7 +33,9 @@ const Signup = async (req, res) => {
           process.env.JWT_SECRET,
           { expiresIn: "30d" }
         );
-        // welcomeMail(saveUser);
+        if (saveUser) {
+          welcomeMail(saveUser);
+        }
         res.status(200).json({
           success: true,
           message: "Signup successful",

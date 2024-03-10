@@ -38,14 +38,23 @@ app.use("/attchments", express.static(path.join(__dirname, "/attchments")));
 app.get("/api/pdf/:id", async (req, res) => {
   const { id } = req.params;
   const task = await Task.findById(id);
-  if (task?.filename) {
-    const filePath = path.join(__dirname, "attchments", task?.filename);
-    res.status(200).json({
-      success: true,
-      file: filePath,
-      comment: task?.comment,
-      fileOriginalName: task?.fileOriginalName,
-    });
+  if (task) {
+    if (task?.filename) {
+      const filePath = path?.join(__dirname, "attchments", task?.filename);
+      res.status(200).json({
+        success: true,
+        file: filePath,
+        comment: task?.comment,
+        fileOriginalName: task?.fileOriginalName,
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        // file: filePath,
+        comment: task?.comment,
+        // fileOriginalName: task?.fileOriginalName,
+      });
+    }
   } else {
     res.status(400).json({
       success: false,

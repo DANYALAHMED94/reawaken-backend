@@ -59,7 +59,7 @@ app.get("/api/pdf/:id", async (req, res) => {
   } else {
     res.status(400).json({
       success: false,
-      message: "comments and attachments not found",
+      message: "Comments and attachments not found",
     });
   }
 });

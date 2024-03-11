@@ -3,7 +3,7 @@ import Task from "./taskModel.js";
 const AddTask = async (req, res) => {
   const { taskName, taskStatus, dueDate, date, time, userId } = req.body;
 
-  if (taskName && taskStatus && date && time && userId && dueDate) {
+  if (taskName && taskStatus && userId && dueDate) {
     if (time && date) {
       try {
         const newTask = new Task({
@@ -37,7 +37,7 @@ const AddTask = async (req, res) => {
     } else {
       res.status(400).json({
         success: false,
-        message: "Date and Time is required in Reminder",
+        message: "Due date and Time is required in Reminder",
       });
     }
   } else {

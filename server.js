@@ -47,14 +47,15 @@ app.get("/api/pdf/:id", async (req, res) => {
         comment: task?.comment,
         fileOriginalName: task?.fileOriginalName,
       });
-    } else {
-      res.status(200).json({
-        success: true,
-        // file: filePath,
-        comment: task?.comment,
-        // fileOriginalName: task?.fileOriginalName,
-      });
     }
+    // else {
+    //   res.status(200).json({
+    //     success: true,
+    //     // file: filePath,
+    //     comment: task?.comment,
+    //     // fileOriginalName: task?.fileOriginalName,
+    //   });
+    // }
   } else {
     res.status(400).json({
       success: false,

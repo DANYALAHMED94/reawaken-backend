@@ -9,9 +9,7 @@ import taskRoute from "./task/taskUpload.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import fs from "fs";
 import cron from "node-cron";
-import schedule from "node-schedule";
 import Task from "./task/taskModel.js";
 import twilio from "twilio";
 import User from "./user/userModel.js";
@@ -25,7 +23,6 @@ app.use(express.json());
 app.use(cors());
 dotenv.config();
 const MONGO_DB = process.env.MONGO_DB;
-// mongoose.set("strictQuery", true);
 connectDb(MONGO_DB);
 app.use("/api", router);
 app.use("/api", taskRouter);
@@ -47,15 +44,12 @@ app.get("/api/pdf/:id", async (req, res) => {
         comment: task?.comment,
         fileOriginalName: task?.fileOriginalName,
       });
+    } else {
+      res.status(200).json({
+        success: true,
+        comment: task?.comment,
+      });
     }
-    // else {
-    //   res.status(200).json({
-    //     success: true,
-    //     // file: filePath,
-    //     comment: task?.comment,
-    //     // fileOriginalName: task?.fileOriginalName,
-    //   });
-    // }
   } else {
     res.status(400).json({
       success: false,

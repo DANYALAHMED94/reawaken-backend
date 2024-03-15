@@ -34,7 +34,7 @@ const Signup = async (req, res) => {
           { expiresIn: "30d" }
         );
         if (saveUser) {
-          welcomeMail(saveUser);
+          // welcomeMail(saveUser);
         }
         res.status(200).json({
           success: true,
@@ -158,7 +158,35 @@ const updateForgetPassword = async (req, res) => {
   }
 };
 
-export { Signup, Login, forgetPassword, updateForgetPassword };
+const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (id) {
+      const user = await User.findById(id).select("-password");
+      if (user) {
+        res.status(200).json({
+          success: true,
+          message: "User Details",
+          user,
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "User id not found",
+      });
+    }
+  } catch (error) {
+    res.status(500).json(error.message);
+  }
+};
+
+export { Signup, Login, forgetPassword, updateForgetPassword, getUserById };
 
 const sendForgetPasswordLink = (user, token) => {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);

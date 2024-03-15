@@ -25,6 +25,7 @@ const AddTask = async (req, res) => {
         res.status(200).json({
           success: true,
           message: "Task added successfully",
+          id: saveTask?._id,
           saveTask,
         });
       } catch (error) {
@@ -321,6 +322,32 @@ const updateTaskComment = async (req, res) => {
   }
 };
 
+const getTaskById = async (req, res) => {
+  const { id } = req.params;
+
+  if (id) {
+    try {
+      const values = await Task.findById(id);
+      res.status(200).json({
+        success: true,
+        message: "All tasks",
+        data: values,
+      });
+    } catch (error) {
+      console.log(error.message);
+      res.status(500).json({
+        success: false,
+        message: "Something went wrong",
+      });
+    }
+  } else {
+    res.status(400).json({
+      success: false,
+      message: "User Id does not exist",
+    });
+  }
+};
+
 export {
   AddTask,
   getTask,
@@ -333,4 +360,5 @@ export {
   getNotification,
   deleteNotification,
   updateTaskComment,
+  getTaskById,
 };

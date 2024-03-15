@@ -37,19 +37,34 @@ const upload = multer({
 });
 
 taskRoute.put("/task/:id", upload.single("filename"), async (req, res) => {
-  const { taskName, comment } = req.body;
+  const { taskName, comment, taskStatus, date, time, dueDate } = req.body;
   const { id } = req.params;
   const filename = req?.file?.filename;
   const fileOriginalName = req?.file?.originalname;
 
   const task = await Task.findById(id);
-  if (taskName || comment || fileOriginalName || filename) {
+  if (
+    taskName ||
+    comment ||
+    fileOriginalName ||
+    filename ||
+    taskStatus ||
+    date ||
+    time ||
+    dueDate
+  ) {
     try {
       if (task) {
         if (task?.filename?.length && filename?.length) {
           removeImage(task?.filename);
         }
         task.taskName = taskName || task.taskName;
+        task.taskStatus = taskStatus || task.taskStatus;
+        task.dueDate = dueDate || task.dueDate;
+        task.reminder = {
+          date: date || task?.reminder.date,
+          time: time || task?.reminder.time,
+        };
         task.fileOriginalName = fileOriginalName || task.fileOriginalName;
         task.filename = filename ?? task.filename;
         const savetask = await task.save();

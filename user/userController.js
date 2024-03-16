@@ -84,6 +84,7 @@ const Login = async (req, res) => {
             filename: user.filename,
             email: user.email,
             token: token,
+            role: user.role,
           });
         } else {
           res.status(400).json({

@@ -13,6 +13,7 @@ import cron from "node-cron";
 import Task from "./task/taskModel.js";
 import twilio from "twilio";
 import User from "./user/userModel.js";
+import blogUpload from "./blog/blogUpload.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -29,8 +30,11 @@ app.use("/api", taskRouter);
 app.use(express.urlencoded({ extended: true, limit: "500mb" }));
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 app.use("/api", profileRoute);
+app.use("/api", blogUpload);
+
 app.use("/api", taskRoute);
 app.use("/attchments", express.static(path.join(__dirname, "/attchments")));
+app.use("/blogs", express.static(path.join(__dirname, "/blogs")));
 
 app.get("/api/pdf/:id", async (req, res) => {
   const { id } = req.params;

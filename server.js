@@ -138,7 +138,7 @@ cron.schedule("* * * * *", async () => {
     if (currentHours === reminderHours && currentMinutes === reminderMinutes) {
       const user = await User.findById({ _id: reminder.userId });
       // Use Twilio API to send SMS
-      if (user.phoneNumber) {
+      if (user?.phoneNumber) {
         client.messages
           .create({
             body: `Reminder for the task name ${reminder.taskName} whose status is ${reminder.taskStatus}`,

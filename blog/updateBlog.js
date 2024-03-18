@@ -3,7 +3,7 @@ import express from "express";
 import multer from "multer";
 import fs from "fs";
 import Blog from "./blogModel.js";
-const blogUpload = express.Router();
+const updateBlog = express.Router();
 
 const storage = multer.diskStorage({
   destination(req, file, cb) {
@@ -36,45 +36,46 @@ const upload = multer({
   },
 });
 
-blogUpload.post("/blog", upload.single("filename"), async (req, res) => {
+updateBlog.put("/blog/:id", upload.single("filename"), async (req, res) => {
+  const { id } = req.params;
   const { title, description } = req.body;
   const filename = req?.file?.filename;
-
+  const blog = await Blog.findById(id);
   if (title || description || filename) {
-    try {
-      // if (filename?.length) {
-      //   removeImage(filename);
-      // }
+    if (blog) {
+      try {
+        if (blog?.filename?.length && filename?.length) {
+          removeImage(filename);
+        }
 
-      const newBlog = new Blog({
-        title: title,
-        description: description,
-        filename: filename,
-      });
+        blog.title = title || blog.title;
+        blog.description = description || blog.description;
+        blog.filename = filename ?? blog.filename;
 
-      const saveBlog = await newBlog.save();
-      if (saveBlog) {
-        res.status(200).json({
-          success: true,
-          message: "Blog created successfully",
-          blog: {
-            title: saveBlog?.title,
-            fileOriginalName: saveBlog?.description,
-            filename: saveBlog?.filename,
-          },
-        });
-      } else {
+        const saveBlog = await blog.save();
+        if (saveBlog) {
+          res.status(200).json({
+            success: true,
+            message: "Blog created successfully",
+            blog: {
+              title: saveBlog?.title,
+              fileOriginalName: saveBlog?.description,
+              filename: saveBlog?.filename,
+            },
+          });
+        } else {
+          res.status(400).json({
+            success: false,
+            message: "something wents wrong",
+          });
+        }
+      } catch (error) {
+        console.log(error, "error");
         res.status(400).json({
           success: false,
           message: "something wents wrong",
         });
       }
-    } catch (error) {
-      console.log(error, "error");
-      res.status(400).json({
-        success: false,
-        message: "something wents wrong",
-      });
     }
   } else {
     res.status(400).json({
@@ -84,7 +85,7 @@ blogUpload.post("/blog", upload.single("filename"), async (req, res) => {
   }
 });
 
-export default blogUpload;
+export default updateBlog;
 
 const removeImage = (file) => {
   fs.unlink("./blogs/" + file, function (err) {

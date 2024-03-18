@@ -3,48 +3,41 @@ import Task from "./taskModel.js";
 const AddTask = async (req, res) => {
   const { taskName, taskStatus, dueDate, date, time, userId } = req.body;
 
-  if (taskName && taskStatus && userId && dueDate) {
-    if (time && date) {
-      try {
-        const newTask = new Task({
-          taskName: taskName,
-          reminder: {
-            date: date,
-            time: time,
-          },
-          userId: userId,
-          taskStatus: taskStatus,
-          dueDate: dueDate,
-          notification: {
-            message: `You have created ${taskStatus} task`,
-            isOpen: false,
-          },
-        });
-        const saveTask = await newTask.save();
+  if (taskName && taskStatus && userId) {
+    try {
+      const newTask = new Task({
+        taskName: taskName,
+        reminder: {
+          date: date,
+          time: time,
+        },
+        userId: userId,
+        taskStatus: taskStatus,
+        dueDate: dueDate,
+        notification: {
+          message: `You have created ${taskStatus} task`,
+          isOpen: false,
+        },
+      });
+      const saveTask = await newTask.save();
 
-        res.status(200).json({
-          success: true,
-          message: "Task added successfully",
-          id: saveTask?._id,
-          saveTask,
-        });
-      } catch (error) {
-        console.log(error.message);
-        res.status(500).json({
-          success: false,
-          mesaage: "Something wents wrong",
-        });
-      }
-    } else {
-      res.status(400).json({
+      res.status(200).json({
+        success: true,
+        message: "Task added successfully",
+        id: saveTask?._id,
+        saveTask,
+      });
+    } catch (error) {
+      console.log(error.message);
+      res.status(500).json({
         success: false,
-        message: "Due date and Time is required in Reminder",
+        mesaage: "Something wents wrong",
       });
     }
   } else {
     res.status(400).json({
       success: false,
-      message: "Please fill empty fields",
+      message: "Task name and task status is required",
     });
   }
 };

@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.26bd591c.css",
-    "main.js": "/static/js/main.bf2d584c.js",
+    "main.css": "/static/css/main.de58d698.css",
+    "main.js": "/static/js/main.53cb9def.js",
     "static/media/Exo2-Bold.ttf": "/static/media/Exo2-Bold.343af6210440d7ad761e.ttf",
     "static/media/Exo2-Medium.ttf": "/static/media/Exo2-Medium.2652eb40eee461d69f6b.ttf",
     "static/media/Exo2-Regular.ttf": "/static/media/Exo2-Regular.d8703b6aa928306cccf5.ttf",
@@ -9,17 +9,19 @@
     "static/media/revicons.eot": "/static/media/revicons.a77de540a38981833f9e.eot",
     "static/media/revicons.ttf": "/static/media/revicons.57fd05d4ae650374c8de.ttf",
     "static/media/revicons.woff": "/static/media/revicons.e8746a624ed098489406.woff",
+    "static/media/edit.svg": "/static/media/edit.ce513e901815bb5d0fc9d429fa0b5e83.svg",
+    "static/media/delete.svg": "/static/media/delete.0103c6c97795781626f8b29a77e1555b.svg",
     "static/media/menu.svg": "/static/media/menu.6c9b99ebe65e726151bfa9a3aaaa0959.svg",
     "index.html": "/index.html",
     "static/media/bellIcon.svg": "/static/media/bellIcon.c7965722312c6ca1062d2d0406ea1a4d.svg",
     "static/media/Vector 3.svg": "/static/media/Vector 3.3225141a4193c9ac7d36.svg",
     "static/media/setting.svg": "/static/media/setting.b0df1dd558927725a280.svg",
     "static/media/plus.svg": "/static/media/plus.4135f02d65f0019c75561946065880c9.svg",
-    "main.26bd591c.css.map": "/static/css/main.26bd591c.css.map",
-    "main.bf2d584c.js.map": "/static/js/main.bf2d584c.js.map"
+    "main.de58d698.css.map": "/static/css/main.de58d698.css.map",
+    "main.53cb9def.js.map": "/static/js/main.53cb9def.js.map"
   },
   "entrypoints": [
-    "static/css/main.26bd591c.css",
-    "static/js/main.bf2d584c.js"
+    "static/css/main.de58d698.css",
+    "static/js/main.53cb9def.js"
   ]
 }

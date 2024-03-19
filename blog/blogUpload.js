@@ -39,7 +39,6 @@ const upload = multer({
 blogUpload.post("/blog", upload.single("filename"), async (req, res) => {
   const { title, description } = req.body;
   const filename = req?.file?.filename;
-
   if (title || description || filename) {
     try {
       // if (filename?.length) {
@@ -59,7 +58,7 @@ blogUpload.post("/blog", upload.single("filename"), async (req, res) => {
           message: "Blog created successfully",
           blog: {
             title: saveBlog?.title,
-            fileOriginalName: saveBlog?.description,
+            description: saveBlog?.description,
             filename: saveBlog?.filename,
           },
         });

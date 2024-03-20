@@ -39,7 +39,7 @@ const upload = multer({
 blogUpload.post("/blog", upload.single("filename"), async (req, res) => {
   const { title, description } = req.body;
   const filename = req?.file?.filename;
-  if (title || description || filename) {
+  if ((title && description) || filename) {
     try {
       // if (filename?.length) {
       //   removeImage(filename);
@@ -78,23 +78,9 @@ blogUpload.post("/blog", upload.single("filename"), async (req, res) => {
   } else {
     res.status(400).json({
       success: false,
-      message: "something wents wrong",
+      message: "Title and description is required",
     });
   }
 });
 
 export default blogUpload;
-
-const removeImage = (file) => {
-  fs.unlink("./blogs/" + file, function (err) {
-    if (err && err.code == "ENOENT") {
-      // file doens't exist
-      console.info("File doesn't exist, won't remove it.");
-    } else if (err) {
-      // other errors, e.g. maybe we don't have enough permission
-      console.error("Error occurred while trying to remove file");
-    } else {
-      console.info(`removed`);
-    }
-  });
-};

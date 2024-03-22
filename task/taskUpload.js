@@ -41,7 +41,6 @@ taskRoute.put("/task/:id", upload.single("filename"), async (req, res) => {
   const { id } = req.params;
   const filename = req?.file?.filename;
   const fileOriginalName = req?.file?.originalname;
-
   const task = await Task.findById(id);
   if (
     taskName ||

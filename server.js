@@ -16,14 +16,28 @@ import User from "./user/userModel.js";
 import blogUpload from "./blog/blogUpload.js";
 import updateBlog from "./blog/updateBlog.js";
 import blogRouter from "./blog/blogRoutes.js";
+import hostedRoute from "./routes/stripe/hostedroute.js";
+import bodyParser from "body-parser";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || process.env.BASE_URL_FRONTEND.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+  })
+);
 dotenv.config();
 const MONGO_DB = process.env.MONGO_DB;
 connectDb(MONGO_DB);
@@ -36,6 +50,8 @@ app.use("/api", blogUpload);
 app.use("/api", updateBlog);
 app.use("/api", taskRoute);
 app.use("/api", blogRouter);
+app.use("/api", hostedRoute);
+
 app.use("/attchments", express.static(path.join(__dirname, "/attchments")));
 app.use("/blogs", express.static(path.join(__dirname, "/blogs")));
 

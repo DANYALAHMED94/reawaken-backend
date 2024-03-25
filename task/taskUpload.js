@@ -60,10 +60,12 @@ taskRoute.put("/task/:id", upload.single("filename"), async (req, res) => {
         task.taskName = taskName || task.taskName;
         task.taskStatus = taskStatus || task.taskStatus;
         task.dueDate = dueDate || task.dueDate;
-        task.reminder = {
-          date: date || task?.reminder.date,
-          time: time || task?.reminder.time,
-        };
+        if (date || time) {
+          task.reminder = {
+            date: date || task?.reminder.date,
+            time: time || task?.reminder.time,
+          };
+        }
         task.fileOriginalName = fileOriginalName || task.fileOriginalName;
         task.filename = filename ?? task.filename;
         const savetask = await task.save();
